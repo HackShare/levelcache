@@ -20,7 +20,8 @@ TODO
 
 
 ## The Architecture
-TODO
+![levelcache architecture](https://raw.githubusercontent.com/ctriposs/levelcache/master/doc/lcache_arch.png)
+
 
 ## How to Use
 TODO
