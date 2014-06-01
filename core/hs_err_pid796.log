@@ -1,0 +1,181 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x0000000002603e0d, pid=796, tid=8692
+#
+# JRE version: 6.0_45-b06
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (20.45-b01 mixed mode windows-amd64 compressed oops)
+# Problematic frame:
+# J  com.ctriposs.lcache.offheap.UnsafeOffHeapMemory.putLong(JJ)V
+#
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00000000003cc000):  JavaThread "main" [_thread_in_Java, id=8692, stack(0x0000000002490000,0x0000000002590000)]
+
+siginfo: ExceptionCode=0xc0000005, writing address 0x0000000007a00040
+
+Registers:
+RAX=0x000000075c91f780, RBX=0x000000075c91f780, RCX=0x00000007cc3b1d50, RDX=0x00000007cc3b1d50
+RSP=0x000000000258e8d0, RBP=0x000000000258e968, RSI=0x0000000000000001, RDI=0x0000000000000000
+R8 =0x0000000007a00040, R9 =0x0000000000000000, R10=0x0000000007a00040, R11=0x0000000002603e00
+R12=0x0000000000000000, R13=0x000000000258e900, R14=0x000000075c933d40, R15=0x00000000003cc000
+RIP=0x0000000002603e0d, EFLAGS=0x0000000000010202
+
+Top of Stack: (sp=0x000000000258e8d0)
+0x000000000258e8d0:   000000000258e920 000000075c51b328
+0x000000000258e8e0:   000000000258e968 0000000002595b22
+0x000000000258e8f0:   0000000000000000 0000000002595b22
+0x000000000258e900:   0000000000000000 0000000002595ffc
+0x000000000258e910:   0000000000000000 0000000000000028
+0x000000000258e920:   00000007cc3b1d50 000000000258e928
+0x000000000258e930:   000000075c7f3304 000000000258e9f8
+0x000000000258e940:   000000075c8eee00 000000075c933d40
+0x000000000258e950:   000000075c7f3490 000000000258e900
+0x000000000258e960:   000000000258e9b0 000000000258ea40
+0x000000000258e970:   00000000025959c9 0000000000000000
+0x000000000258e980:   0000000000000000 0000000000000001
+0x000000000258e990:   0000000000000000 0000000000000000
+0x000000000258e9a0:   0000000000000000 0000000000000000
+0x000000000258e9b0:   0000000000000000 0000000000000000
+0x000000000258e9c0:   0000014655593c86 0000000000000001 
+
+Instructions: (pc=0x0000000002603e0d)
+0x0000000002603ded:   2f 39 fc ff 66 66 90 0f 1f 84 00 00 00 00 00 66
+0x0000000002603dfd:   66 66 90 55 48 83 ec 10 90 4c 03 42 10 4d 8b d0
+0x0000000002603e0d:   4d 89 0a 48 83 c4 10 5d 85 05 e5 c1 d0 fd c3 f4
+0x0000000002603e1d:   f4 f4 f4 e9 3b 9f fe ff e8 00 00 00 00 48 83 2c 
+
+
+Register to memory mapping:
+
+RAX=0x000000075c91f780 is an oop
+{method} 
+ - klass: {other class}
+RBX=0x000000075c91f780 is an oop
+{method} 
+ - klass: {other class}
+RCX=0x00000007cc3b1d50 is an oop
+com.ctriposs.lcache.offheap.UnsafeOffHeapMemory 
+ - klass: 'com/ctriposs/lcache/offheap/UnsafeOffHeapMemory'
+RDX=0x00000007cc3b1d50 is an oop
+com.ctriposs.lcache.offheap.UnsafeOffHeapMemory 
+ - klass: 'com/ctriposs/lcache/offheap/UnsafeOffHeapMemory'
+RSP=0x000000000258e8d0 is pointing into the stack for thread: 0x00000000003cc000
+RBP=0x000000000258e968 is pointing into the stack for thread: 0x00000000003cc000
+RSI=0x0000000000000001 is an unknown value
+RDI=0x0000000000000000 is an unknown value
+R8 =0x0000000007a00040 is an unknown value
+R9 =0x0000000000000000 is an unknown value
+R10=0x0000000007a00040 is an unknown value
+R11=0x0000000002603c90 [CodeBlob (0x0000000002603c90)]
+Framesize: 4
+R12=0x0000000000000000 is an unknown value
+R13=0x000000000258e900 is pointing into the stack for thread: 0x00000000003cc000
+R14=0x000000075c933d40 is an oop
+{method data} 
+ - klass: {other class}
+R15=0x00000000003cc000 is a thread
+
+
+Stack: [0x0000000002490000,0x0000000002590000],  sp=0x000000000258e8d0,  free space=1018k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+J  com.ctriposs.lcache.offheap.UnsafeOffHeapMemory.putLong(JJ)V
+j  com.ctriposs.lcache.table.HashMapTable.appendNew([B[BJJ)Lcom/ctriposs/lcache/table/IMapEntry;+50
+j  com.ctriposs.lcache.table.HashMapTableTest.operationAfterClosedTest()V+54
+v  ~StubRoutines::call_stub
+V  [jvm.dll+0x1eac57]
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x0000000006bf9800 JavaThread "ReaderThread" [_thread_in_native, id=8736, stack(0x0000000007310000,0x0000000007410000)]
+  0x0000000006b7c800 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=3196, stack(0x0000000007110000,0x0000000007210000)]
+  0x0000000006b71000 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=2800, stack(0x0000000007010000,0x0000000007110000)]
+  0x0000000006b6c000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=7324, stack(0x0000000006f10000,0x0000000007010000)]
+  0x0000000006b69800 JavaThread "Attach Listener" daemon [_thread_blocked, id=8336, stack(0x0000000006e10000,0x0000000006f10000)]
+  0x0000000006b20000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=3568, stack(0x0000000006d10000,0x0000000006e10000)]
+  0x000000000052c800 JavaThread "Finalizer" daemon [_thread_blocked, id=7316, stack(0x0000000006a10000,0x0000000006b10000)]
+  0x0000000000525800 JavaThread "Reference Handler" daemon [_thread_blocked, id=8936, stack(0x0000000006910000,0x0000000006a10000)]
+=>0x00000000003cc000 JavaThread "main" [_thread_in_Java, id=8692, stack(0x0000000002490000,0x0000000002590000)]
+
+Other Threads:
+  0x000000000051e000 VMThread [stack: 0x0000000006810000,0x0000000006910000] [id=8200]
+  0x0000000006b8d000 WatcherThread [stack: 0x0000000007210000,0x0000000007310000] [id=8156]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap
+ PSYoungGen      total 47424K, used 18765K [0x00000007cb200000, 0x00000007ce6e0000, 0x0000000800000000)
+  eden space 40704K, 46% used [0x00000007cb200000,0x00000007cc4535a0,0x00000007cd9c0000)
+  from space 6720K, 0% used [0x00000007ce050000,0x00000007ce050000,0x00000007ce6e0000)
+  to   space 6720K, 0% used [0x00000007cd9c0000,0x00000007cd9c0000,0x00000007ce050000)
+ PSOldGen        total 108288K, used 0K [0x0000000761600000, 0x0000000767fc0000, 0x00000007cb200000)
+  object space 108288K, 0% used [0x0000000761600000,0x0000000761600000,0x0000000767fc0000)
+ PSPermGen       total 21248K, used 5345K [0x000000075c400000, 0x000000075d8c0000, 0x0000000761600000)
+  object space 21248K, 25% used [0x000000075c400000,0x000000075c938578,0x000000075d8c0000)
+
+Code Cache  [0x0000000002590000, 0x0000000002800000, 0x0000000005590000)
+ total_blobs=334 nmethods=119 adapters=169 free_code_cache=49766976 largest_free_block=12224
+
+Dynamic libraries:
+0x0000000000400000 - 0x000000000042f000 	D:\tools\sdk\jdk1.6.0_45\bin\javaw.exe
+0x0000000077300000 - 0x00000000774a9000 	C:\Windows\SYSTEM32\ntdll.dll
+0x00000000771e0000 - 0x00000000772ff000 	C:\Windows\system32\kernel32.dll
+0x000007fefd8f0000 - 0x000007fefd95b000 	C:\Windows\system32\KERNELBASE.dll
+0x000007fefe050000 - 0x000007fefe12b000 	C:\Windows\system32\ADVAPI32.dll
+0x000007fefe410000 - 0x000007fefe4af000 	C:\Windows\system32\msvcrt.dll
+0x000007feff310000 - 0x000007feff32f000 	C:\Windows\SYSTEM32\sechost.dll
+0x000007feff4e0000 - 0x000007feff60d000 	C:\Windows\system32\RPCRT4.dll
+0x00000000770e0000 - 0x00000000771da000 	C:\Windows\system32\USER32.dll
+0x000007fefe4b0000 - 0x000007fefe517000 	C:\Windows\system32\GDI32.dll
+0x000007fefddb0000 - 0x000007fefddbe000 	C:\Windows\system32\LPK.dll
+0x000007fefde40000 - 0x000007fefdf09000 	C:\Windows\system32\USP10.dll
+0x000007fefe020000 - 0x000007fefe04e000 	C:\Windows\system32\IMM32.DLL
+0x000007fefdf10000 - 0x000007fefe019000 	C:\Windows\system32\MSCTF.dll
+0x000000006d8e0000 - 0x000000006e09c000 	D:\tools\sdk\jdk1.6.0_45\jre\bin\server\jvm.dll
+0x000007fef9930000 - 0x000007fef996b000 	C:\Windows\system32\WINMM.dll
+0x000000006d850000 - 0x000000006d85e000 	D:\tools\sdk\jdk1.6.0_45\jre\bin\verify.dll
+0x000000006d460000 - 0x000000006d487000 	D:\tools\sdk\jdk1.6.0_45\jre\bin\java.dll
+0x000000006d8a0000 - 0x000000006d8b2000 	D:\tools\sdk\jdk1.6.0_45\jre\bin\zip.dll
+0x000000006d6c0000 - 0x000000006d6d7000 	D:\tools\sdk\jdk1.6.0_45\jre\bin\net.dll
+0x000007fefe130000 - 0x000007fefe17d000 	C:\Windows\system32\WS2_32.dll
+0x000007feff4d0000 - 0x000007feff4d8000 	C:\Windows\system32\NSI.dll
+0x000007fefcf90000 - 0x000007fefcfe5000 	C:\Windows\system32\mswsock.dll
+0x000007fefcf80000 - 0x000007fefcf87000 	C:\Windows\System32\wship6.dll
+0x000007fefc990000 - 0x000007fefc997000 	C:\Windows\System32\wshtcpip.dll
+0x00000000774d0000 - 0x00000000774d7000 	C:\Windows\system32\PSAPI.DLL
+
+VM Arguments:
+jvm_args: -Dfile.encoding=GBK 
+java_command: org.eclipse.jdt.internal.junit.runner.RemoteTestRunner -version 3 -port 3244 -testLoaderClass org.eclipse.jdt.internal.junit4.runner.JUnit4TestLoader -loaderpluginname org.eclipse.jdt.junit4.runtime -classNames com.ctriposs.lcache.table.HashMapTableTest
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=D:\tools\sdk\jdk1.7.0_45
+PATH=D:\tools\Ruby193\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;D:\study3\play-2.1.5;D:\tools\sdk\jdk1.7.0_45\bin;C:\Program Files\Microsoft\Web Platform Installer\;C:\Program Files (x86)\Microsoft ASP.NET\ASP.NET Web Pages\v1.0\;C:\Program Files (x86)\Windows Kits\8.0\Windows Performance Toolkit\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;c:\Program Files (x86)\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\Tools\Binn\;c:\Program Files\Microsoft SQL Server\100\DTS\Binn\;D:\tools\apache-maven-3.1.1\bin;D:\tools\Git\cmd;D:\tools\groovy-2.1.7\bin;D:\tools\gradle-1.11\bin;D:\tools\apache-cassandra-1.1.12\bin
+USERNAME=Administrator
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 42 Stepping 7, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 7 , 64 bit Build 7601 Service Pack 1
+
+CPU:total 4 (2 cores per cpu, 2 threads per core) family 6 model 42 stepping 7, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, ht
+
+Memory: 4k page, physical 10394864k(7101280k free), swap 20787864k(17022868k free)
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (20.45-b01) for windows-amd64 JRE (1.6.0_45-b06), built on Apr  1 2013 12:31:37 by "java_re" with MS VC++ 8.0 (VS2005)
+
+time: Sun Jun 01 10:54:10 2014
+elapsed time: 0 seconds
+
