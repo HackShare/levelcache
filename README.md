@@ -1,7 +1,7 @@
 ##_DISCLAIMER_
 #### This project is still under construction. Beta testers are more than welcome.
 
-# SessDB
+# LevelCache
 
 A Big, Fast, In-Memory Key/Value Cache backed by Java OffHeap Memory, based on a variant of LSM([Log Structured Merge Tree](http://en.wikipedia.org/wiki/Log-structured_merge-tree)) algorithm, inspired by [Google LevelDB](http://code.google.com/p/leveldb/).
 
@@ -10,9 +10,9 @@ For a similar cache with persistence support, please refer to [SessDB](https://g
 
 ## Feature Highlight:
 1. **High Read/Write Performance**: read/write performance close to O(1) direct memory access, tailored for session data scenarios, also suitable for caching data scenarios.
-2. **Efficient Memory Usage**: uses only a small amount of heap memory, leverages a hierarchical storage mechanism, only most recently inserted fresh data resides on heap memory, a big amount of less fresh data resides on offheap memory. hierarchical sotarge ensures high read/write performance, while heap GC has no big performance impact.
+2. **Efficient Memory Usage**: uses only a small amount of heap memory, leverages a hierarchical storage mechanism, only a small amount of most recently inserted fresh keys reside on heap memory, a big amount of key/value data resides on offheap memory. hierarchical sotarge ensures high read/write performance, while heap GC has no big performance impact.
 3. **Thread Safe**: supporting multi-threads concurrent and non-blocking access.
-4. **Compaction**: automatic expired and deleted data cleanup, avoiding memory space waste.
+4. **Expiration & Compaction**: automatic expired and deleted data cleanup, avoiding memory space waste.
 5. **Light in Design & Implementation**: simple Map like interface, only supports Get/Put/Delete operations, cross platform Java based, small codebase size, embeddable.
 
 ## Performance Highlight:
