@@ -20,7 +20,7 @@ import com.ctriposs.lcache.table.HashMapTablePerfTest.SampleValue;
 
 import static com.ctriposs.lcache.table.HashMapTablePerfTest.users;
 
-public class LCachePerfTest {
+public class LCachePerfTestA {
 	
 	private LCache cache;
 	
