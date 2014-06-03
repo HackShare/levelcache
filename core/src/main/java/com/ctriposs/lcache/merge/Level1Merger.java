@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 
 import com.ctriposs.lcache.LCache;
 import com.ctriposs.lcache.LevelQueue;
+import com.ctriposs.lcache.stats.LCacheStats;
 import com.ctriposs.lcache.table.AbstractMapTable;
 import com.ctriposs.lcache.table.AbstractSortedMapTable;
 import com.ctriposs.lcache.table.IMapEntry;
@@ -35,15 +36,17 @@ public class Level1Merger extends Thread {
 	private static final int CACHED_MAP_ENTRIES = 32;
 
 	private List<LevelQueue> levelQueueList;
+    private final LCacheStats stats;
 
 	private volatile boolean stop = false;
 	private CountDownLatch countDownLatch;
 	private short shard;
 
-	public Level1Merger(List<LevelQueue> levelQueueList, CountDownLatch countDownLatch, short shard) {
+	public Level1Merger(List<LevelQueue> levelQueueList, CountDownLatch countDownLatch, short shard, LCacheStats stats) {
 		this.levelQueueList = levelQueueList;
 		this.countDownLatch = countDownLatch;
 		this.shard = shard;
+        this.stats = stats;
 	}
 
 	@Override
@@ -61,7 +64,9 @@ public class Level1Merger extends Thread {
 					log.info("Current queue size at level 1 is " + lq1.size());
 					log.info("Current queue size at level 2 is " + lq2.size());
 
+					long start = System.nanoTime();
 					mergeSort(lq1, lq2, DEFAULT_MERGE_WAYS, shard);
+					stats.recordMerging(LCache.LEVEL1, System.nanoTime() - start);
 
 					merged = true;
 					log.info("End running level 1 to 2 merging at " + DateFormatter.formatCurrentDate());
@@ -99,7 +104,7 @@ public class Level1Merger extends Thread {
 		} finally {
 			lq1.getReadLock().unlock();
 		}
-		
+
 		long expectedInsertions = 0;
 		long expectedDataSize = 0;
 		for(AbstractMapTable table : tables) {

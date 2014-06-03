@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 
 import com.ctriposs.lcache.LCache;
 import com.ctriposs.lcache.LevelQueue;
+import com.ctriposs.lcache.stats.LCacheStats;
 import com.ctriposs.lcache.table.AbstractMapTable;
 import com.ctriposs.lcache.table.ByteArrayWrapper;
 import com.ctriposs.lcache.table.HashMapTable;
@@ -38,15 +39,17 @@ public class Level0Merger extends Thread {
 	public static final int DEFAULT_MERGE_WAYS = 2; // 2 way merge
 
 	private List<LevelQueue> levelQueueList;
-	
+    private final LCacheStats stats;
+
 	private volatile boolean stop = false;
 	private CountDownLatch countDownLatch;
 	private short shard;
 
-	public Level0Merger(List<LevelQueue> levelQueueList, CountDownLatch countDownLatch, short shard) {
+	public Level0Merger(List<LevelQueue> levelQueueList, CountDownLatch countDownLatch, short shard, LCacheStats stats) {
 		this.levelQueueList = levelQueueList;
 		this.countDownLatch = countDownLatch;
 		this.shard = shard;
+        this.stats = stats;
 	}
 
 	@Override
@@ -58,8 +61,10 @@ public class Level0Merger extends Thread {
 					log.info("Start running level 0 merge thread at " + DateFormatter.formatCurrentDate());
 					log.info("Current queue size at level 0 is " + levelQueue0.size());
 
+					long start = System.nanoTime();
 					LevelQueue levelQueue1 = levelQueueList.get(LCache.LEVEL1);
 					mergeSort(levelQueue0, levelQueue1, DEFAULT_MERGE_WAYS, shard);
+					stats.recordMerging(LCache.LEVEL0, System.nanoTime() - start);
 
 					log.info("Stopped running level 0 merge thread at " + DateFormatter.formatCurrentDate());
 
@@ -113,7 +118,7 @@ public class Level0Merger extends Thread {
 						Entry<ByteArrayWrapper, InMemIndex> o2) {
 					IMapEntry mapEntry1 = hmTable.getMapEntry(o1.getValue().getIndex());
 					IMapEntry mapEntry2 = hmTable.getMapEntry(o2.getValue().getIndex());
-					
+
 					int hash1 = mapEntry1.getKeyHash();
 					int hash2 = mapEntry2.getKeyHash();
 					if (hash1 < hash2) return -1;

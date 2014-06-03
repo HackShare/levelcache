@@ -9,6 +9,9 @@ import java.util.concurrent.CountDownLatch;
 
 import com.ctriposs.lcache.merge.Level0Merger;
 import com.ctriposs.lcache.merge.Level1Merger;
+import com.ctriposs.lcache.stats.LCacheStats;
+import com.ctriposs.lcache.stats.MemStatsCollector;
+import com.ctriposs.lcache.stats.Operations;
 import com.ctriposs.lcache.table.AbstractMapTable;
 import com.ctriposs.lcache.table.GetResult;
 import com.ctriposs.lcache.table.HashMapTable;
@@ -36,18 +39,20 @@ public class LCache implements Closeable {
 	private volatile HashMapTable[] activeInMemTables;
 	private Object[] activeInMemTableCreationLocks;
 	private List<LevelQueue>[] levelQueueLists;
+	private final LCacheStats stats = new LCacheStats();
 
 	private CacheConfig config;
 	private Level0Merger[] level0Mergers;
 	private Level1Merger[] level1Mergers;
 	private CountDownLatch[] countDownLatches;
+	private MemStatsCollector memStatsCollector;
 
 	private boolean closed = false;
 
 	public LCache() {
 		this(CacheConfig.DEFAULT);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public LCache(CacheConfig config) {
 		this.config = config;
@@ -74,6 +79,9 @@ public class LCache implements Closeable {
 			this.activeInMemTables[i].setCompressionEnabled(this.config.isCompressionEnabled());
 		}
 
+		memStatsCollector = new MemStatsCollector(stats, levelQueueLists);
+		memStatsCollector.start();
+
 		this.startLevelMergers();
 	}
 
@@ -86,14 +94,18 @@ public class LCache implements Closeable {
 		level1Mergers = new Level1Merger[config.getShardNumber()];
 
 		for(short i = 0; i < this.config.getShardNumber(); i++) {
-			level0Mergers[i] = new Level0Merger(this.levelQueueLists[i], countDownLatches[i], i);
+			level0Mergers[i] = new Level0Merger(this.levelQueueLists[i], countDownLatches[i], i, stats);
 			level0Mergers[i].start();
-			level1Mergers[i] = new Level1Merger(this.levelQueueLists[i], countDownLatches[i], i);
+			level1Mergers[i] = new Level1Merger(this.levelQueueLists[i], countDownLatches[i], i, stats);
 			level1Mergers[i].start();
 		}
 	}
 
 	public CacheConfig getConfig() { return this.config; }
+
+	public LCacheStats getStats() {
+		return this.stats;
+	}
 
 	/**
 	 * Put key/value entry into the DB with no timeout
@@ -135,6 +147,8 @@ public class LCache implements Closeable {
 		Preconditions.checkArgument(key != null && key.length > 0, "key is empty");
 		Preconditions.checkArgument(value != null && value.length > 0, "value is empty");
 		ensureNotClosed();
+		long start = System.nanoTime();
+		String operation = isDelete ? Operations.DELETE : Operations.PUT;
 		try {
 			short shard = this.getShard(key);
 			boolean success = this.activeInMemTables[shard].put(key, value, timeToLive, createdTime, isDelete);
@@ -162,11 +176,14 @@ public class LCache implements Closeable {
 				}
 			}
 		} catch(IOException ioe) {
+			stats.recordError(operation);
 			if (isDelete) {
 				throw new RuntimeException("Fail to delete key, IOException occurr", ioe);
 			}
 			throw new RuntimeException("Fail to put key & value, IOException occurr", ioe);
-		} 
+		} finally {
+			stats.recordOperation(operation, INMEM_LEVEL, System.nanoTime() - start);
+		}
 	}
 
 	/**
@@ -179,6 +196,8 @@ public class LCache implements Closeable {
 	public byte[] get(byte[] key) {
 		Preconditions.checkArgument(key != null && key.length > 0, "key is empty");
 		ensureNotClosed();
+		long start = System.nanoTime();
+		int reachedLevel = INMEM_LEVEL;
 		try {
 			short shard = this.getShard(key);
 			// check active hashmap table first
@@ -191,6 +210,7 @@ public class LCache implements Closeable {
 				}
 			} else {
 				// check level0 hashmap tables
+				reachedLevel = LEVEL0;
 				LevelQueue lq0 = levelQueueLists[shard].get(LEVEL0);
 				lq0.getReadLock().lock();
 				try {
@@ -218,6 +238,7 @@ public class LCache implements Closeable {
 				// check level 1-2 on disk sorted tables
 				searchLevel12: {
 					for(int level = 1; level <= MAX_LEVEL; level++) {
+						reachedLevel = level;
 						LevelQueue lq = levelQueueLists[shard].get(level);
 						lq.getReadLock().lock();
 						try {
@@ -246,7 +267,10 @@ public class LCache implements Closeable {
 			}
 		}
 		catch(IOException ioe) {
+			stats.recordError(Operations.GET);
 			throw new RuntimeException("Fail to get value by key, IOException occurr", ioe);
+		} finally {
+			stats.recordOperation(Operations.GET, reachedLevel, System.nanoTime() - start);
 		}
 
 		return null; // no luck
@@ -255,6 +279,8 @@ public class LCache implements Closeable {
 	@Override
 	public void close() throws IOException {
 		if (closed) return;
+
+		memStatsCollector.setStop();
 
 		for(int i = 0; i < config.getShardNumber(); i++) {
 			this.activeInMemTables[i].close();
