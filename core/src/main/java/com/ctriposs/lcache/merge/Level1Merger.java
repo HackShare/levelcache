@@ -201,7 +201,9 @@ public class Level1Merger extends Thread {
 				lq1.removeLast();
 			}
 
-			lq2.addFirst(sortedMapTable);
+			if (!sortedMapTable.isEmpty()) {
+				lq2.addFirst(sortedMapTable);
+			}
 		} finally {
 			lq2.getWriteLock().unlock();
 			lq1.getWriteLock().unlock();

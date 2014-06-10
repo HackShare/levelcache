@@ -114,7 +114,7 @@ public abstract class AbstractSortedMapTable extends AbstractMapTable {
 	// memory saving
 	public void truncate() {
 		long realIndexSize = INDEX_ITEM_LENGTH * toAppendIndex.get();
-		if (realIndexSize < this.indexOffHeapMemory.length()) {
+		if (realIndexSize > 0 && realIndexSize < this.indexOffHeapMemory.length()) {
 			OffHeapMemory tempOffHeampMemory = OffHeapMemory.allocateMemory(realIndexSize);
 			this.indexOffHeapMemory.copy(0, tempOffHeampMemory, 0, realIndexSize);
 			this.indexOffHeapMemory.free();
@@ -122,7 +122,7 @@ public abstract class AbstractSortedMapTable extends AbstractMapTable {
 		}
 		
 		long realDataSize = this.toAppendDataOffHeapMemoryOffset.get();
-		if (realDataSize < this.dataOffHeapMemory.length()) {
+		if (realDataSize > 0 && realDataSize < this.dataOffHeapMemory.length()) {
 			OffHeapMemory tempOffHeampMemory = OffHeapMemory.allocateMemory(realDataSize);
 			this.dataOffHeapMemory.copy(0, tempOffHeampMemory, 0, realDataSize);
 			this.dataOffHeapMemory.free();

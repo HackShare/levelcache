@@ -235,7 +235,7 @@ public class LCache implements Closeable {
 					}
 				}
 
-				// check level 1-2 on disk sorted tables
+				// check level 1-2 offheap sorted tables
 				searchLevel12: {
 					for(int level = 1; level <= MAX_LEVEL; level++) {
 						reachedLevel = level;

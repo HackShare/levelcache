@@ -186,7 +186,9 @@ public class Level0Merger extends Thread {
 				source.removeLast();
 			}
 
-			target.addFirst(sortedMapTable);
+			if (!sortedMapTable.isEmpty()) {
+				target.addFirst(sortedMapTable);
+			}
 
 		} finally {
 			target.getWriteLock().unlock();
