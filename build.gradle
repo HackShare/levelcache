@@ -9,7 +9,7 @@ apply from: file('gradle/versioning.gradle')
 apply from: file('gradle/convention.gradle')
 
 subprojects {
-	group = "com.ctriposs.lcache"
+	group = "com.ctriposs"
 
     dependencies {
         testCompile 'junit:junit:4.11'

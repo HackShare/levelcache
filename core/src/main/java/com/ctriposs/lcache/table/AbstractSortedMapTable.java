@@ -114,19 +114,19 @@ public abstract class AbstractSortedMapTable extends AbstractMapTable {
 	// memory saving
 	public void truncate() {
 		long realIndexSize = INDEX_ITEM_LENGTH * toAppendIndex.get();
-		if (realIndexSize > 0 && realIndexSize < this.indexOffHeapMemory.length()) {
-			OffHeapMemory tempOffHeampMemory = OffHeapMemory.allocateMemory(realIndexSize);
-			this.indexOffHeapMemory.copy(0, tempOffHeampMemory, 0, realIndexSize);
+		if (realIndexSize > 0 && realIndexSize < (this.indexOffHeapMemory.length() * 4 / 5)) {
+			OffHeapMemory tempOffHeapMemory = OffHeapMemory.allocateMemory(realIndexSize);
+			this.indexOffHeapMemory.copy(0, tempOffHeapMemory, 0, realIndexSize);
 			this.indexOffHeapMemory.free();
-			this.indexOffHeapMemory = tempOffHeampMemory;
+			this.indexOffHeapMemory = tempOffHeapMemory;
 		}
 		
 		long realDataSize = this.toAppendDataOffHeapMemoryOffset.get();
-		if (realDataSize > 0 && realDataSize < this.dataOffHeapMemory.length()) {
-			OffHeapMemory tempOffHeampMemory = OffHeapMemory.allocateMemory(realDataSize);
-			this.dataOffHeapMemory.copy(0, tempOffHeampMemory, 0, realDataSize);
+		if (realDataSize > 0 && realDataSize < (this.dataOffHeapMemory.length() * 4 / 5)) {
+			OffHeapMemory tempOffHeapMemory = OffHeapMemory.allocateMemory(realDataSize);
+			this.dataOffHeapMemory.copy(0, tempOffHeapMemory, 0, realDataSize);
 			this.dataOffHeapMemory.free();
-			this.dataOffHeapMemory = tempOffHeampMemory;
+			this.dataOffHeapMemory = tempOffHeapMemory;
 		}
 	}
 

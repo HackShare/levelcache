@@ -238,10 +238,12 @@ public class Level1Merger extends Thread {
 				while(index < size && count < CACHED_MAP_ENTRIES) {
 					IMapEntry mapEntry = sortedMapTable.getMapEntry(index);
 					// eager loading
+					/*
 					mapEntry.getKey();
 					mapEntry.getValue();
 					mapEntry.getTimeToLive();
 					mapEntry.getCreatedTime();
+					*/
 					queue.add(mapEntry);
 					index++;
 					count++;

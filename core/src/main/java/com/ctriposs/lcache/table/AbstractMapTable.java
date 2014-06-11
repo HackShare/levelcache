@@ -96,8 +96,8 @@ public abstract class AbstractMapTable implements Closeable, Comparable<Abstract
 	
 	@Override
 	public void close() {
-		this.indexOffHeapMemory.free();
-		this.dataOffHeapMemory.free();
+		if (this.indexOffHeapMemory != null) this.indexOffHeapMemory.free();
+		if (this.dataOffHeapMemory != null) this.dataOffHeapMemory.free();
 		closed = true;
 	}
 

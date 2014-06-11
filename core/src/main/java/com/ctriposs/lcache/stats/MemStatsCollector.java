@@ -54,6 +54,6 @@ public class MemStatsCollector extends Thread {
 
     public void setStop() {
         this.stop = true;
-        log.info("Stopping file stats collector thread " + this.getName());
+        log.info("Stopping mem stats collector thread " + this.getName());
     }
 }
