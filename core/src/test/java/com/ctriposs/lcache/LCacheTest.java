@@ -83,7 +83,7 @@ public class LCacheTest {
 		return ref != null ? ref.get().getCount() : 0;
 	}
 
-	private static void outputStats(LCacheStats stats) {
+	public static void outputStats(LCacheStats stats) {
 		for (String key : stats.getAvgStatsMap().keySet()) {
 			AvgStats avgStats = stats.getAvgStatsMap().get(key).get();
 			if (avgStats.getCount() == 0) {
