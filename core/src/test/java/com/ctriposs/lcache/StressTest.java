@@ -15,7 +15,7 @@ public class StressTest {
 		int keyLimit = 1024 * 16;
 		int valueLengthLimit = 1024 * 16;
 		
-		LCache cache = new LCache();
+		LCache cache = new LCache(CacheConfig.DEFAULT);
 		
 		Map<String, byte[]> map = new HashMap<String, byte[]>();
 		
@@ -36,6 +36,8 @@ public class StressTest {
 				map.remove(String.valueOf(rndKey));
 				cache.delete(String.valueOf(rndKey).getBytes());
 			}
+			// put 10 seconds time to live KV pairs
+			cache.put((String.valueOf(counter) + "-ttl").getBytes(), rndBytes, (long)10 * 1000);
 			if (counter%1000000 == 0) {
 				System.out.println("Current date " + DateFormatter.formatCurrentDate());
 				System.out.println(""+counter);
