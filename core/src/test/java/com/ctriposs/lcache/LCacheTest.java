@@ -19,7 +19,7 @@ import static com.ctriposs.lcache.stats.LCacheStats.*;
 public class LCacheTest {
 
 	// You can set the STRESS_FACTOR system property to make the tests run more iterations.
-	public static final double STRESS_FACTOR = Double.parseDouble(System.getProperty("STRESS_FACTOR", "1.3"));
+	public static final double STRESS_FACTOR = Double.parseDouble(System.getProperty("STRESS_FACTOR", "1.0"));
 
 	private LCache cache;
 
@@ -76,6 +76,15 @@ public class LCacheTest {
 		assertEquals(totalMemSize, activeInMemSize + level0MemSize + level1MemSize + level2MemSize);
 
 		outputStats(stats);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testMaxMemCapLimit() {
+		CacheConfig config = new CacheConfig();
+		config.setMaxMemCapacity(500 * 1024 * 1024);
+		cache = new LCache(config);
+
+		cache.put(new byte[100], new byte[100]);
 	}
 
 	@After

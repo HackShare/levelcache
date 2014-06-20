@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.ctriposs.lcache.merge.Level0Merger;
 import com.ctriposs.lcache.merge.Level1Merger;
 import com.ctriposs.lcache.stats.LCacheStats;
 import com.ctriposs.lcache.stats.MemStatsCollector;
 import com.ctriposs.lcache.stats.Operations;
+import com.ctriposs.lcache.stats.SingleStats;
 import com.ctriposs.lcache.table.AbstractMapTable;
 import com.ctriposs.lcache.table.GetResult;
 import com.ctriposs.lcache.table.HashMapTable;
@@ -112,6 +114,9 @@ public class LCache implements Closeable {
 	 *
 	 * @param key the map entry key
 	 * @param value the map entry value
+	 * @exception java.lang.IllegalStateException
+	 *      occurs when the size of off-heap memory occupied by {@link LCache}
+	 *      exceeds {@link CacheConfig#getMaxMemCapacity()}
 	 */
 	public void put(byte[] key, byte[] value) {
 		this.put(key, value, AbstractMapTable.NO_TIMEOUT, System.currentTimeMillis(), false);
@@ -123,6 +128,9 @@ public class LCache implements Closeable {
 	 * @param key the map entry key
 	 * @param value the map entry value
 	 * @param timeToLive time to live
+	 * @exception java.lang.IllegalStateException
+	 *      occurs when the size of off-heap memory occupied by {@link LCache}
+	 *      exceeds {@link CacheConfig#getMaxMemCapacity()}
 	 */
 	public void put(byte[] key, byte[] value, long timeToLive) {
 		this.put(key, value, timeToLive, System.currentTimeMillis(), false);
@@ -147,6 +155,10 @@ public class LCache implements Closeable {
 		Preconditions.checkArgument(key != null && key.length > 0, "key is empty");
 		Preconditions.checkArgument(value != null && value.length > 0, "value is empty");
 		ensureNotClosed();
+		if (!isDelete) {
+			checkMemCapacity();
+		}
+
 		long start = System.nanoTime();
 		String operation = isDelete ? Operations.DELETE : Operations.PUT;
 		try {
@@ -313,6 +325,18 @@ public class LCache implements Closeable {
 
 		closed = true;
 		log.info("Cache Closed.");
+	}
+
+	protected void checkMemCapacity() {
+		AtomicReference<SingleStats> memSizeStats = stats.getSingleStatsMap().get(LCacheStats.MEM_SIZE_TOTAL);
+		if (memSizeStats == null) {
+			return;
+		}
+		long maxMemCapacity = config.getMaxMemCapacity();
+		if (maxMemCapacity > 0 && memSizeStats.get().getValue() > maxMemCapacity) {
+			throw new IllegalStateException(
+					"LevelCache is exceeding the max memory capacity. Cannot perform put operation at the moment.");
+		}
 	}
 
 	protected void ensureNotClosed() {
