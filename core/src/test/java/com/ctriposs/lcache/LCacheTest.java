@@ -14,11 +14,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
+import static com.ctriposs.lcache.stats.LCacheStats.*;
 
 public class LCacheTest {
 
 	// You can set the STRESS_FACTOR system property to make the tests run more iterations.
-	public static final double STRESS_FACTOR = Double.parseDouble(System.getProperty("STRESS_FACTOR", "1.0"));
+	public static final double STRESS_FACTOR = Double.parseDouble(System.getProperty("STRESS_FACTOR", "1.3"));
 
 	private LCache cache;
 
@@ -53,13 +54,12 @@ public class LCacheTest {
 		}
 
 		LCacheStats stats = cache.getStats();
-		long inMemPut = getAvgStatsCount(stats, "put.inMem.cost"),
-				level0Put = getAvgStatsCount(stats, "put.level0.cost");
-		assertEquals(rndStringSet.size(), inMemPut + level0Put);
-		long inMemGet = getAvgStatsCount(stats, "get.inMem.cost"),
-				level0Get = getAvgStatsCount(stats, "get.level0.cost"),
-				level1Get = getAvgStatsCount(stats, "get.level1.cost"),
-				level2Get = getAvgStatsCount(stats, "get.level2.cost");
+		long inMemPut = getAvgStatsCount(stats, PUT_INMEM);
+		assertEquals(rndStringSet.size(), inMemPut);
+		long inMemGet = getAvgStatsCount(stats, GET_INMEM),
+				level0Get = getAvgStatsCount(stats, GET_LEVEL0),
+				level1Get = getAvgStatsCount(stats, GET_LEVEL1),
+				level2Get = getAvgStatsCount(stats, GET_LEVEL2);
 		assertEquals(rndStringSet.size() * 2, inMemGet + level0Get + level1Get + level2Get);
 
 		// Make sure MemStatsCollector has enough time to finish up its work.
@@ -67,6 +67,13 @@ public class LCacheTest {
 			Thread.sleep(10 * 1000);
 		} catch (InterruptedException e) {
 		}
+
+		long totalMemSize =getSingleStatsValue(stats, MEM_SIZE_TOTAL);
+		long activeInMemSize = getSingleStatsValue(stats, MEM_SIZE_INMEM),
+				level0MemSize = getSingleStatsValue(stats, MEM_SIZE_LEVEL0),
+				level1MemSize = getSingleStatsValue(stats, MEM_SIZE_LEVEL1),
+				level2MemSize = getSingleStatsValue(stats, MEM_SIZE_LEVEL2);
+		assertEquals(totalMemSize, activeInMemSize + level0MemSize + level1MemSize + level2MemSize);
 
 		outputStats(stats);
 	}
@@ -81,6 +88,11 @@ public class LCacheTest {
 	private static long getAvgStatsCount(LCacheStats stats, String name) {
 		AtomicReference<AvgStats> ref = stats.getAvgStatsMap().get(name);
 		return ref != null ? ref.get().getCount() : 0;
+	}
+
+	private static long getSingleStatsValue(LCacheStats stats, String name) {
+		AtomicReference<SingleStats> ref = stats.getSingleStatsMap().get(name);
+		return ref != null ? ref.get().getValue() : 0;
 	}
 
 	public static void outputStats(LCacheStats stats) {

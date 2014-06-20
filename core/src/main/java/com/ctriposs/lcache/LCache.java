@@ -79,7 +79,7 @@ public class LCache implements Closeable {
 			this.activeInMemTables[i].setCompressionEnabled(this.config.isCompressionEnabled());
 		}
 
-		memStatsCollector = new MemStatsCollector(stats, levelQueueLists);
+		memStatsCollector = new MemStatsCollector(stats, activeInMemTables, levelQueueLists);
 		memStatsCollector.start();
 
 		this.startLevelMergers();

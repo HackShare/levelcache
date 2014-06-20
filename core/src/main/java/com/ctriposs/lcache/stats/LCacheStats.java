@@ -10,6 +10,22 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class LCacheStats {
 
+    public static final String GET_INMEM = Operations.GET + ".inMem.cost";
+    public static final String GET_LEVEL0 = Operations.GET + ".level0.cost";
+    public static final String GET_LEVEL1 = Operations.GET + ".level1.cost";
+    public static final String GET_LEVEL2 = Operations.GET + ".level2.cost";
+    public static final String PUT_INMEM = Operations.PUT + ".inMem.cost";
+    public static final String DELETE_INMEM = Operations.DELETE + ".inMem.cost";
+
+    public static final String MERGING_LEVEL0= "merging.level0.cost";
+    public static final String MERGING_LEVEL1 = "merging.level1.cost";
+
+    public static final String MEM_SIZE_TOTAL = "storage.memSize";
+    public static final String MEM_SIZE_INMEM = "storage.inMem.memSize";
+    public static final String MEM_SIZE_LEVEL0 = "storage.level0.memSize";
+    public static final String MEM_SIZE_LEVEL1 = "storage.level1.memSize";
+    public static final String MEM_SIZE_LEVEL2 = "storage.level2.memSize";
+
     private final ConcurrentHashMap<String, AtomicReference<AvgStats>> avgStatsMap = new ConcurrentHashMap<String, AtomicReference<AvgStats>>();
 
     private final ConcurrentHashMap<String, AtomicReference<SingleStats>> singleStatsMap = new ConcurrentHashMap<String, AtomicReference<SingleStats>>();
@@ -45,8 +61,13 @@ public class LCacheStats {
         avgRef.get().addValue(cost);
     }
 
+    public void recordTotalMemStats(long memSize) {
+        AtomicReference<SingleStats>  singleRef = getSingleStats(MEM_SIZE_TOTAL);
+        singleRef.get().setValue(memSize);
+    }
+
     public void recordMemStats(int level, long memSize) {
-        String prefix = "storage.level" + level;
+        String prefix = "storage" + (level != LCache.INMEM_LEVEL ?  ".level" + level : ".inMem");
 
         AtomicReference<SingleStats>  singleRef = getSingleStats(prefix + ".memSize");
         singleRef.get().setValue(memSize);
@@ -77,20 +98,21 @@ public class LCacheStats {
     }
 
     private void initStats() {
-        getAvgStats(Operations.GET + ".inMem.cost");
-        getAvgStats(Operations.GET + ".level0.cost");
-        getAvgStats(Operations.GET + ".level1.cost");
-        getAvgStats(Operations.GET + ".level2.cost");
+        getAvgStats(GET_INMEM);
+        getAvgStats(GET_LEVEL0);
+        getAvgStats(GET_LEVEL1);
+        getAvgStats(GET_LEVEL2);
 
-        getAvgStats(Operations.PUT + ".inMem.cost");
+        getAvgStats(PUT_INMEM);
+        getAvgStats(DELETE_INMEM);
 
-        getAvgStats(Operations.DELETE + ".inMem.cost");
+        getAvgStats(MERGING_LEVEL0);
+        getAvgStats(MERGING_LEVEL1);
 
-        getAvgStats("merging.level0.cost");
-        getAvgStats("merging.level1.cost");
-
-        getSingleStats("storage.level0.memSize");
-        getSingleStats("storage.level1.memSize");
-        getSingleStats("storage.level2.memSize");
+        getSingleStats(MEM_SIZE_TOTAL);
+        getSingleStats(MEM_SIZE_INMEM);
+        getSingleStats(MEM_SIZE_LEVEL0);
+        getSingleStats(MEM_SIZE_LEVEL1);
+        getSingleStats(MEM_SIZE_LEVEL2);
     }
 }
